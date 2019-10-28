@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AppRetry.API.DTO;
 using AppRetry.API.Entities;
-using AppRetry.API.Infra.Interface;
+using AppRetry.API.Interface.IRepositories;
 using AppRetry.API.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -22,10 +22,12 @@ namespace AppRetry.API.Controllers
             _imapper = iMapper;
         }
 
-
+        /// <summary>
+        /// Return a list of users.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesDefaultResponseType]
         public async Task<IActionResult> ObterUsers()
         {
             var data = await _iUserRepository.ObterUsers();
@@ -33,16 +35,31 @@ namespace AppRetry.API.Controllers
         }
 
 
+        /// <summary>
+        /// Creates a User.
+        /// </summary>
+        /// <remarks>
+        ///     POST /User
+        ///     {
+        ///        "name": "string",
+        ///        "email": "string",
+        ///        "password": "string"
+        ///     }
+        /// </remarks>
+        /// <param name="user"></param>
+        /// <returns>A newly created User</returns>
+        /// <response code="201">Returns the newly created user</response>
+        /// <response code="400">If the user is null</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesDefaultResponseType]
-        public async Task<ActionResult> SaveUser([FromBody] UserDTO userDTO)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> SaveUser([FromBody] UserDTO user)
         {
-            userDTO.Email = userDTO.Email.ToLower();
-            if (await _iUserRepository.UserExists(userDTO.Email))
+            user.Email = user.Email.ToLower();
+            if (await _iUserRepository.UserExists(user.Email))
                 return BadRequest("Email já existe");
 
-            var createUser = _imapper.Map<User>(userDTO);
+            var createUser = _imapper.Map<User>(user);
             var createdUser = await _iUserRepository.SaveUser(createUser);
 
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.UserId }, createdUser);
@@ -51,7 +68,6 @@ namespace AppRetry.API.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesDefaultResponseType]
         public async Task<ActionResult<User>> GetUser(long id)
         {
             var user = await _iUserRepository.GetUser(id);
@@ -69,7 +85,7 @@ namespace AppRetry.API.Controllers
                 return BadRequest();
 
             await _iUserRepository.AlterUser(user);
-            
+
             return NoContent();
         }
 

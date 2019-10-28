@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AppRetry.API.DTO;
 using AppRetry.API.Entities;
 using AppRetry.API.Infra.Context;
-using AppRetry.API.Infra.Interface;
+using AppRetry.API.Interface.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppRetry.API.Repositories
@@ -19,10 +19,9 @@ namespace AppRetry.API.Repositories
         }
 
 
-        public async Task<IEnumerable<UserDTO>> ObterUsers()
+        public async Task<IEnumerable<UserListDTO>> ObterUsers()
         {
-            // throw new System.NotImplementedException();
-            var dados = await _context.User.Select(x => new UserDTO
+            var dados = await _context.User.Select(x => new UserListDTO
             {
                 UserId = x.UserId,
                 Name = x.Name,
@@ -44,8 +43,8 @@ namespace AppRetry.API.Repositories
 
         public async Task<User> GetUser(long id)
         {
-            var test = await _context.User.FindAsync(id);
-            return test;
+            var user = await _context.User.FindAsync(id);
+            return user;
         }
 
 

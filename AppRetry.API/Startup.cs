@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using AppRetry.API.DTO;
 using AppRetry.API.Infra.Context;
-using AppRetry.API.Infra.Interface;
+using AppRetry.API.Interface.IRepositories;
+using AppRetry.API.Interfce.IServices;
 using AppRetry.API.Repositories;
+using AppRetry.API.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,13 +39,26 @@ namespace AppRetry.API
 
             services.AddTransient<IUserRepository, UserRepository>();
 
+            services.AddHttpClient<CatalogService>();
+            // services.AddTransient<ICatalogService, CatalogService>();
+            
             services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "App Retry", Version = "V1" });
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "App Retry",
+                    Description = "A simple ASP.NET 2.2 Core Web API"
+                });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -60,15 +76,13 @@ namespace AppRetry.API
             }
 
 
-            // app.UseHttpsRedirection();
-
             // Ative o middleware para servir o Swagger gerado como um endpoint JSON.
             app.UseSwagger(c =>
             {
                 c.RouteTemplate = "api/swagger/{documentname}/swagger.json";
             });
 
-             // Habilitar o middleware para servir swagger-ui (HTML, JS, CSS, etc.)
+            // Habilitar o middleware para servir swagger-ui (HTML, JS, CSS, etc.)
             // especificando o terminal JSON do Swagger.
             app.UseSwaggerUI(c =>
             {
@@ -76,6 +90,9 @@ namespace AppRetry.API
                 //  Para atender à interface do usuário do Swagger na raiz do aplicativo
                 c.RoutePrefix = "api/swagger";
             });
+
+            // app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseMvc();
         }

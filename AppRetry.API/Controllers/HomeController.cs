@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using AppRetry.API.DTO;
 using AppRetry.API.Infra.Context;
-using AppRetry.API.Infra.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,16 +13,8 @@ namespace AppRetry.API.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
-        private readonly IUserRepository _iUserRepository;
-        
-        public HomeController(IUserRepository iUserRepository)
-        {
-            _iUserRepository = iUserRepository;
-        }
-
-
         /// <summary>
-        /// Return Version, Pais, Machine Name, Sistema
+        /// Return Version, Country, Machine Name, System.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -34,7 +25,7 @@ namespace AppRetry.API.Controllers
                 Version = "0.0.1",
                 CultureInfo = CultureInfo.CurrentCulture.DisplayName,
                 Environment.MachineName,
-                Sistema = Environment.OSVersion.VersionString
+                System = Environment.OSVersion.VersionString
             };
         }
     }

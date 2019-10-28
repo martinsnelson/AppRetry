@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using AppRetry.API.DTO;
 using AppRetry.API.Entities;
 
-namespace AppRetry.API.Infra.Interface
+namespace AppRetry.API.Interface.IRepositories
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<UserDTO>> ObterUsers();
+        Task<IEnumerable<UserListDTO>> ObterUsers();
         Task<User> SaveUser(User user);
         Task<User> GetUser(long id);
         Task<User> AlterUser(User user);
